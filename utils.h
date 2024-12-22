@@ -6,7 +6,7 @@
 #include <string>
 #include <cstring>
 #include <fstream>
-
+#include <random>
 
 enum Team {
     none,
@@ -30,7 +30,7 @@ enum FIFOAction {
     JOIN_TO_QUEUE, // info is empty
     SET_QUEUED_PROCESS_PID, // info is pid
     INVITE_TO_CONTROL, // info is team
-    READY_TO_CONTROL,  // info is empty
+    READY_TO_CONTROL,  // team
     FAN_NERVOUS_ABOUT_WAITING,  // info is empty
     NO_OTHER_IN_QUEUE,  // info is empty
 };
@@ -51,5 +51,7 @@ key_t FIFO_KEY;
 int FIFO_ID;
 
 void create_message_queue();
-void send_message(long mtype, FIFOAction action, const std::string& info);
+void send_message(long, FIFOAction);
+void send_message(long, FIFOAction, int);
+void send_message(long, FIFOAction, const std::string&);
 FIFOMessage receive_message(long mtype);

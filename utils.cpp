@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#include <thread>
+
 void create_message_queue() {
     FIFO_KEY = ftok(".", 'a');
     if (FIFO_KEY == -1) {
@@ -18,22 +20,26 @@ void send_message(long mtype, FIFOAction action) {
     send_message(mtype, action, "");
 }
 
-void send_message(long mtype, FIFOAction action, const int info) {
-    send_message(mtype, action, std::to_string(info));
+void send_message(long mtype, FIFOAction action, int info) {
+    send_message(mtype, action, std::to_string(info).data());
 }
 
-void send_message(long mtype, FIFOAction action, const char *info) {
+void m_send_message(long mtype, FIFOAction action, const std::string& info) {
     FIFOMessage message = {};
     message.mtype = mtype;
     message.sender = getpid();
     message.action = action;
-    strncpy(message.info, info, sizeof(message.info) - 1);
+    strncpy(message.info, info.c_str(), sizeof(message.info) - 1);
     message.info[sizeof(message.info) - 1] = '\0';
-
     if (msgsnd(FIFO_ID, &message, sizeof(message) - sizeof(long), 0) == -1) {
         perror("msgsnd failed");
         exit(EXIT_FAILURE);
     }
+}
+
+void send_message(long mtype, FIFOAction action, const std::string& info) {
+    std::thread worker(m_send_message, mtype, action, info);
+    worker.detach();
 }
 
 FIFOMessage receive_message(long mtype) {

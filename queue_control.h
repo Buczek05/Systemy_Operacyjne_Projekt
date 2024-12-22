@@ -1,8 +1,8 @@
 #pragma once
+#include "utils.cpp"
 #include <thread>
 #include <chrono>
 #include <ctime>
-#include "utils.cpp"
 
 class Control {
 public:
@@ -11,7 +11,6 @@ public:
     Control() {team=none; available_place=3;};
     void check_fan(pid_t);
 };
-
 
 Control controls[3];
 pid_t first_in_queue = 0;
