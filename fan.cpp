@@ -30,9 +30,9 @@ void listen_for_messages_queue() {
             else if (!queued_process_pid) {
                 send_message(CONTROL, NO_OTHER_IN_QUEUE);
             }
-            else if (message.action == ENJOY_THE_GAME) {
-                place = OnTheWayToTheStands;
-            }
+        }
+        else if (message.action == ENJOY_THE_GAME) {
+            place = OnTheWayToTheStands;
         }
     }
 }
