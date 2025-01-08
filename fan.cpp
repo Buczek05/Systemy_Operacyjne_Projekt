@@ -4,14 +4,18 @@ void listen_for_messages_queue() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
-        std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
-                  << "Action: " << message.action << ", Sender: " << message.sender
-                  << ", Info: " << message.info << std::endl;
+        // std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
+        //           << "Action: " << message.action << ", Sender: " << message.sender
+        //           << ", Info: " << message.info << std::endl;
         if (message.action == SET_QUEUED_PROCESS_PID) {
             queued_process_pid = std::stoi(message.info);
         }
         else if (message.action == INVITE_TO_CONTROL) {
-            if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
+            if (children_count && std::stoi(message.info) == none) {
+                m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
+                send_message(CONTROL, READY_TO_CONTROL_WITH_CHILDREN, team);
+            }
+            else if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
                 m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
                 send_message(CONTROL, READY_TO_CONTROL, team);
             }
@@ -26,21 +30,53 @@ void listen_for_messages_queue() {
             else if (!queued_process_pid) {
                 send_message(CONTROL, NO_OTHER_IN_QUEUE);
             }
+            else if (message.action == ENJOY_THE_GAME) {
+                place = OnTheWayToTheStands;
+            }
         }
     }
 }
 
 void join_queue() {
-    send_message(QUEUE, JOIN_TO_QUEUE);
+    send_message(QUEUE, JOIN_TO_QUEUE, VIP);
 }
 
-int main(){
-    for (int i =0; i<10; i++) fork();
+void generate_children() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::discrete_distribution<> children_distribution({80, 15, 5});
+    children_count = children_distribution(gen);
+
+    std::uniform_int_distribution<> age_distribution(0, 15);
+
+    children = new Child[children_count];
+    for (int i = 0; i < children_count; i++) {
+        int age = age_distribution(gen);
+        children[i] = Child(age);
+    }
+}
+
+void setup_random_fan_data() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(1, 2);
     team = static_cast<Team>(dis(gen));
-    std::cout << "Kibic (PID: " << getpid() << ") jest w drużynie " << team << std::endl;
+    VIP = std::uniform_int_distribution<>(1, 200)(gen) == 1;
+    age = std::uniform_int_distribution<>(16, 100)(gen);
+    generate_children();
+    std::cout << "Kibic (PID: " << getpid() << "), wiek: " << age << ", VIP: " << (VIP ? "TAK" : "NIE")
+            << ", drużyna: " << team << ", liczba dzieci: " << children_count << ", dzieci: ";
+    for (int i = 0; i < children_count; i++) {
+        if (i > 0) std::cout << ", ";
+        std::cout << "dziecko " << i + 1 << " (wiek: " << children[i].age << " lat)";
+    }
+    std::cout << std::endl;
+}
+
+int main(){
+    for (int i =0; i<3; i++) fork();
+    setup_random_fan_data();
     create_message_queue();
     std::thread listener_thread(listen_for_messages_queue);
     listener_thread.detach();

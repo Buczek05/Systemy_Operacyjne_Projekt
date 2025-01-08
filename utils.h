@@ -27,12 +27,15 @@ enum FanPlace {
 };
 
 enum FIFOAction {
-    JOIN_TO_QUEUE, // info is empty
+    JOIN_TO_QUEUE, // VIP
     SET_QUEUED_PROCESS_PID, // info is pid
     INVITE_TO_CONTROL, // info is team
     READY_TO_CONTROL,  // team
+    READY_TO_CONTROL_WITH_CHILDREN,  // children_count
     FAN_NERVOUS_ABOUT_WAITING,  // info is empty
     NO_OTHER_IN_QUEUE,  // info is empty
+    ENJOY_THE_GAME,  // info is empty
+    LIMIT_REACHED,  // info is empty
 };
 
 struct FIFOMessage {
