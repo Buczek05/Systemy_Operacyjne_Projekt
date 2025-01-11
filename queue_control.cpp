@@ -25,8 +25,8 @@ void listen_for_messages_queue() {
         if (message.action == JOIN_TO_QUEUE) {
             int VIP = std::stoi(message.info);
             if (VIP) {
-                send_message(message.sender, ENJOY_THE_GAME);
                 fan_count++;
+                send_message(message.sender, ENJOY_THE_GAME);
             }
             else {
                 if (last_in_queue)
@@ -47,13 +47,14 @@ void listen_for_message_control(Control *control) {
     if (message.action == READY_TO_CONTROL) {
         control->team = (Team)std::stoi(message.info);
         control->available_place--;
+        fan_count++;
         std::thread worker(&Control::check_fan, control, message.sender);
         worker.detach();
-        fan_count++;
     }
     else if (message.action == READY_TO_CONTROL_WITH_CHILDREN) {
         int children_count = std::stoi(message.info);
         control->available_place = 0;
+        fan_count += children_count + 1;
         std::thread worker(&Control::check_fan_with_children, control, message.sender, children_count);
         worker.detach();
     }
@@ -89,8 +90,12 @@ void Control::check_fan_with_children(pid_t fan_pid, int children_count) {
 
 void control() {
     while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         for (int i = 0; i < 3; i++) {
+            if (fan_count >= FAN_LIMIT) {
+                std::cout << "Limit reached" << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+                break;
+            }
             // std::cout << "Checking control: " << i << " available_place: " << controls[i].available_place << " actual first in queue: " << first_in_queue << std::endl;
             if (controls[i].available_place > 0 and first_in_queue) {
                 controls[i].team = (controls[i].available_place == 3) ? none : controls[i].team;

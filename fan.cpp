@@ -75,7 +75,7 @@ void setup_random_fan_data() {
 }
 
 int main(){
-    for (int i =0; i<3; i++) fork();
+    for (int i =0; i<5; i++) fork();
     setup_random_fan_data();
     create_message_queue();
     std::thread listener_thread(listen_for_messages_queue);
