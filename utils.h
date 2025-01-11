@@ -15,9 +15,11 @@ enum Team {
 };
 
 enum FanPlace {
+// OUTSIDE
     OnTheWay,
     InQueue,
     OnControl,
+// INSIDE
     OnTheWayToTheStands,
     OnTheStands,
     OnTheWayToTheRestroom,
@@ -36,6 +38,7 @@ enum FIFOAction {
     NO_OTHER_IN_QUEUE,  // info is empty
     ENJOY_THE_GAME,  // info is empty
     LIMIT_REACHED,  // info is empty
+    LEAVING_STADIUM,  // info is empty
 };
 
 struct FIFOMessage {
@@ -47,7 +50,7 @@ struct FIFOMessage {
 
 enum FIFOSpecialRecipient {
     CONTROL = 1,
-    QUEUE = 2
+    STADIUM = 2
 };
 
 key_t FIFO_KEY;

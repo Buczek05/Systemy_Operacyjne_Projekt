@@ -1,12 +1,12 @@
 #include "fan.h"
 
-void listen_for_messages_queue() {
+void listen_for_messages_stadium() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
-        // std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
-        //           << "Action: " << message.action << ", Sender: " << message.sender
-        //           << ", Info: " << message.info << std::endl;
+        std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
+                  << "Action: " << message.action << ", Sender: " << message.sender
+                  << ", Info: " << message.info << std::endl;
         if (message.action == SET_QUEUED_PROCESS_PID) {
             queued_process_pid = std::stoi(message.info);
         }
@@ -32,13 +32,14 @@ void listen_for_messages_queue() {
             }
         }
         else if (message.action == ENJOY_THE_GAME) {
+            std::cout << "Kibic (PID: " << my_pid << ") cieszy się grą." << std::endl;
             place = OnTheWayToTheStands;
         }
     }
 }
 
 void join_queue() {
-    send_message(QUEUE, JOIN_TO_QUEUE, VIP);
+    send_message(STADIUM, JOIN_TO_QUEUE, VIP);
 }
 
 void generate_children() {
@@ -74,11 +75,31 @@ void setup_random_fan_data() {
     std::cout << std::endl;
 }
 
+int is_outside() {
+    return place == OnTheWay || place == InQueue || place == OnControl;
+}
+
+void checking_evacuation() {
+    while (is_outside() || *evacuation_signal == 0) {
+        sleep(1);
+    }
+    printf("Fan %d is evacuating.\n", getpid());
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> evacuation_time(2, 120);
+    int wait_time = evacuation_time(gen);
+    sleep(wait_time);
+    send_message(STADIUM, LEAVING_STADIUM);
+}
+
 int main(){
-    for (int i =0; i<5; i++) fork();
+    for (int i =0; i<7; i++) fork();
     setup_random_fan_data();
     create_message_queue();
-    std::thread listener_thread(listen_for_messages_queue);
+    create_evacuation_shared_memory();
+    std::thread evacuation_thread(checking_evacuation);
+    evacuation_thread.detach();
+    std::thread listener_thread(listen_for_messages_stadium);
     listener_thread.detach();
     join_queue();
     while (true) {

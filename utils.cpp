@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <thread>
+#include <sys/shm.h>
 
 void create_message_queue() {
     FIFO_KEY = ftok(".", 'a');
@@ -51,4 +52,14 @@ FIFOMessage receive_message(long mtype) {
     return message;
 }
 
+int *evacuation_signal;
 
+void create_evacuation_shared_memory() {
+    key_t key = ftok("stadium", 65);
+    int shm_id = shmget(key, sizeof(int), 0666 | IPC_CREAT);
+    if (shm_id == -1) {
+        perror("shmget failed");
+        exit(EXIT_FAILURE);
+    }
+    evacuation_signal = (int *) shmat(shm_id, NULL, 0);
+}
