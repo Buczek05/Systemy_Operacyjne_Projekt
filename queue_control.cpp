@@ -145,7 +145,6 @@ void control() {
 }
 
 int main() {
-    std::cout << getpid() << std::endl;
     create_message_queue();
     create_evacuation_shared_memory();
     *evacuation_signal = 0;

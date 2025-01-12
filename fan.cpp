@@ -98,7 +98,6 @@ void checking_evacuation() {
 }
 
 int main(){
-    for (int i =0; i<7; i++) fork();
     setup_random_fan_data();
     create_message_queue();
     create_evacuation_shared_memory();
