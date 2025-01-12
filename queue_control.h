@@ -16,12 +16,7 @@ public:
     void check_fan_with_children(pid_t, int);
 };
 
-int fan_count = 0;
 Control controls[3];
 pid_t first_in_queue = 0;
 pid_t last_in_queue = 0;
 bool control_stop = false;
-
-pid_t *fans_inside = NULL;
-int _fan_inside_count = 0;
-int _fan_inside_limit = 0;

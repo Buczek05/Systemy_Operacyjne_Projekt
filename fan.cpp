@@ -39,7 +39,12 @@ void listen_for_messages_stadium() {
 }
 
 void join_queue() {
-    send_message(STADIUM, JOIN_TO_QUEUE, VIP);
+    if (VIP) {
+        send_message(STADIUM, VIP_ENTERED_TO_STADIUM, children_count);
+    }
+    else {
+        send_message(STADIUM, JOIN_TO_QUEUE, VIP);
+    }
 }
 
 void generate_children() {

@@ -29,7 +29,8 @@ enum FanPlace {
 };
 
 enum FIFOAction {
-    JOIN_TO_QUEUE, // VIP
+    JOIN_TO_QUEUE,
+    VIP_ENTERED_TO_STADIUM, // info is children_count
     SET_QUEUED_PROCESS_PID, // info is pid
     INVITE_TO_CONTROL, // info is team
     READY_TO_CONTROL,  // team
