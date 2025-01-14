@@ -13,7 +13,7 @@ void create_technic(){
 }
 
 void create_fan(){
-    std::this_thread::sleep_for(std::chrono:: milliseconds(10));
+    std::this_thread::sleep_for(std::chrono:: milliseconds(100));
     created_fans++;
     pid_t fan_pid = fork();
     if (fan_pid < 0) {
@@ -41,7 +41,7 @@ void handle_signal(int signal){
 }
 
 int get_new_fans_count(){
-    int new_fans_count = std::rand() % ((100000 - created_fans) / 600) + 1;
+    int new_fans_count = std::rand() % ((10000 - created_fans) / 600) + 1;
     if (100000 - created_fans < 0) new_fans_count = std::rand() % 5;
     std::cout << "New fans count: " << new_fans_count << std::endl;
     return new_fans_count;

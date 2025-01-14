@@ -4,9 +4,9 @@ void listen_for_messages_stadium() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
-        std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
-                  << "Action: " << message.action << ", Sender: " << message.sender
-                  << ", Info: " << message.info << std::endl;
+        // std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
+        //           << "Action: " << message.action << ", Sender: " << message.sender
+        //           << ", Info: " << message.info << std::endl;
         if (message.action == SET_QUEUED_PROCESS_PID) {
             queued_process_pid = std::stoi(message.info);
         }
@@ -22,7 +22,7 @@ void listen_for_messages_stadium() {
             else if (other_fan_let_count < 5 && queued_process_pid) {
                 other_fan_let_count++;
                 send_message(queued_process_pid, INVITE_TO_CONTROL, message.info);
-                std::cout << "Kibic (PID: " << my_pid << ") zaprosił innego kibica (PID: " << queued_process_pid << ") do kontroli. Aktualnie przepuścił " << other_fan_let_count << " kibiców" << std::endl;
+                // std::cout << "Kibic (PID: " << my_pid << ") zaprosił innego kibica (PID: " << queued_process_pid << ") do kontroli. Aktualnie przepuścił " << other_fan_let_count << " kibiców" << std::endl;
             }
             else if (other_fan_let_count == 5) {
                 send_message(CONTROL, FAN_NERVOUS_ABOUT_WAITING);
@@ -33,12 +33,13 @@ void listen_for_messages_stadium() {
         }
         else if (message.action == ENJOY_THE_GAME) {
             std::cout << "Kibic (PID: " << my_pid << ") cieszy się grą." << std::endl;
-            place = OnTheWayToTheStands;
+            change_location();
         }
     }
 }
 
 void join_queue() {
+    place = InQueue;
     if (VIP) {
         send_message(STADIUM, VIP_ENTERED_TO_STADIUM, children_count);
     }
@@ -71,13 +72,13 @@ void setup_random_fan_data() {
     VIP = std::uniform_int_distribution<>(1, 200)(gen) == 1;
     age = std::uniform_int_distribution<>(16, 100)(gen);
     generate_children();
-    std::cout << "Kibic (PID: " << getpid() << "), wiek: " << age << ", VIP: " << (VIP ? "TAK" : "NIE")
-            << ", drużyna: " << team << ", liczba dzieci: " << children_count << ", dzieci: ";
-    for (int i = 0; i < children_count; i++) {
-        if (i > 0) std::cout << ", ";
-        std::cout << "dziecko " << i + 1 << " (wiek: " << children[i].age << " lat)";
-    }
-    std::cout << std::endl;
+    // std::cout << "Kibic (PID: " << getpid() << "), wiek: " << age << ", VIP: " << (VIP ? "TAK" : "NIE")
+    //         << ", drużyna: " << team << ", liczba dzieci: " << children_count << ", dzieci: ";
+    // for (int i = 0; i < children_count; i++) {
+    //     if (i > 0) std::cout << ", ";
+    //     std::cout << "dziecko " << i + 1 << " (wiek: " << children[i].age << " lat)";
+    // }
+    // std::cout << std::endl;
 }
 
 int is_outside() {
@@ -97,6 +98,45 @@ void checking_evacuation() {
     send_message(STADIUM, LEAVING_STADIUM);
 }
 
+void move_to(const FanPlace moving_place, const FanPlace destination) {
+    std::cout << "Kibic (PID: " << getpid() << ") zmienia miejsce z " << place << " na " << destination << std::endl;
+    place = moving_place;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(10, 60);
+    int wait_time = dis(gen);
+    std::this_thread::sleep_for(std::chrono::seconds(wait_time));
+    if (*evacuation_signal == 0) {
+        place = destination;
+        std::cout << "Kibic (PID: " << getpid() << ") dotarł na miejsce: " << place << std::endl;
+    }
+}
+
+void change_location() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> evacuation_time(1, 100);
+    int chance = evacuation_time(gen);
+    if (chance < 80 && place != OnTheStands) move_to(OnTheWayToTheStands, OnTheStands);
+    else if (chance < 80 && place != Restroom) move_to(OnTheWayToTheRestroom, Restroom);
+    else if (place != OnEating) move_to(OnTheWayToEat, OnEating);
+    else move_to(OnTheWayToTheRestroom, Restroom);
+}
+
+void change_location_if_want() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 1000000);
+    int chance = dis(gen);
+    if (
+        (place == OnTheStands && chance % (20*60) == 0)
+        || (place == Restroom && chance % (60) == 0)
+        || (place == OnEating && chance % (5*60) == 0)
+    ){
+        change_location();
+    }
+}
+
 int main(){
     setup_random_fan_data();
     create_message_queue();
@@ -108,6 +148,7 @@ int main(){
     join_queue();
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
+        change_location_if_want();
     }
     return 0;
 }
