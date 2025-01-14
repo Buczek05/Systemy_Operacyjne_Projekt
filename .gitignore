@@ -31,3 +31,13 @@
 *.out
 *.app
 .idea/
+
+# C++ build files
+*.ii
+*.tds
+*.gcov
+*.gcno
+*.gcda
+
+*.bkp
+*dSYM/

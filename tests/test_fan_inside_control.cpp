@@ -4,7 +4,7 @@
 
 void check_fan_count(FansInsideControl &fan_inside_control, int expected_count) {
     if (fan_inside_control.get_inside_fans_count() != expected_count) {
-        throw TestException();
+        throw TestException("Expected fan count: " + std::to_string(expected_count) + ", but got: " + std::to_string(fan_inside_control.get_inside_fans_count()));
     }
 }
 

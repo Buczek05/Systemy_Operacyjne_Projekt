@@ -3,6 +3,7 @@
 #include <iostream>
 #include "utils.cpp"
 #include "test_fan_inside_control.cpp"
+#include "test_manager.cpp"
 
 #define GREEN "\033[0;32m"
 #define RED "\033[0;31m"
@@ -49,20 +50,21 @@ void run_int_func_with_str(bool (*func_to_run)(), const char *test_name) {
         result = func_to_run();
     } catch (const TestException &e) {
         result = false;
+        std::cout << RED << "TestException caught in <" << test_name << ">: " << e.what() << RESET << std::endl;
     } catch (const std::exception &e) {
         result = false;
-        fprintf(stderr, RED "Exception caught in <%s>: %s\n" RESET, test_name, e.what());
+        std::cout << RED << "Exception caught in <" << test_name << ">: " << e.what() << RESET << std::endl;
     } catch (...) {
         result = false;
-        fprintf(stderr, RED "Unknown error occurred in <%s>\n" RESET, test_name);
+        std::cout << RED << "Unknown error occurred in <" << test_name << ">" << RESET << std::endl;
     }
     clock_gettime(CLOCK_MONOTONIC, &t_end);
     struct Time time = get_time(diff(t_start, t_end));
 
     if (result) {
-        printf(GREEN "Test <%s> PASSED; Time taken: %s\n" RESET, test_name, time_to_string(time));
+        std::cout << GREEN << "Test <" << test_name << "> PASSED; Time taken: " << time_to_string(time) << RESET << std::endl;
     } else {
-        printf(RED "Test <%s> FAILED\n" RESET, test_name);
+        std::cout << RED << "Test <" << test_name << "> FAILED" << RESET << std::endl;
     }
 }
 
@@ -70,5 +72,7 @@ int main() {
     run_int_func_with_str(test_fan_inside_control_add_fan, "Test FanInsideControl add_fan");
     run_int_func_with_str(test_fan_inside_control_remove_fan, "Test FanInsideControl remove_fan");
     run_int_func_with_str(test_print_fans_inside, "Test FanInsideControl print_fans_inside");
+    run_int_func_with_str(test_create_technic, "Test create_technic");
+    run_int_func_with_str(test_create_fan, "Test create_fan");
     return 0;
 }
