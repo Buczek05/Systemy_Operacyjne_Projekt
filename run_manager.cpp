@@ -1,12 +1,12 @@
 #include "manager.cpp"
 
-int main(){
+int main() {
     signal(SIGUSR1, handle_signal);
     signal(SIGUSR2, handle_signal);
     create_technic();
 
-    while (true){
-        std::this_thread::sleep_for(std::chrono:: seconds(1));
+    while (true) {
+        sleep(1);
         int new_fans_count = get_new_fans_count();
         for (int i = 0; i < new_fans_count; i++) create_fan();
         if (rand() % 1000 == 0) send_stop_start_signal();

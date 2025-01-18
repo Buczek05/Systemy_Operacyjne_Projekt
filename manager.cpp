@@ -13,7 +13,7 @@ void create_technic(){
 }
 
 void create_fan(){
-    std::this_thread::sleep_for(std::chrono:: milliseconds(100));
+    ms_sleep(100);
     created_fans++;
     pid_t fan_pid = fork();
     if (fan_pid < 0) {
@@ -21,7 +21,7 @@ void create_fan(){
         exit(EXIT_FAILURE);
     }
     if (fan_pid == 0) {
-        execlp("./fan", "fan", nullptr);
+        execlp("./run_fan", "run_fan", nullptr);
         exit(EXIT_FAILURE);
     }
 }

@@ -1,42 +1,63 @@
 #include "fan.h"
 
-void listen_for_messages_stadium() {
+void listen_for_messages() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
         // std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
         //           << "Action: " << message.action << ", Sender: " << message.sender
         //           << ", Info: " << message.info << std::endl;
-        if (message.action == SET_QUEUED_PROCESS_PID) {
-            queued_process_pid = std::stoi(message.info);
-        }
-        else if (message.action == INVITE_TO_CONTROL) {
-            if (children_count && std::stoi(message.info) == none) {
-                m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
-                send_message(CONTROL, READY_TO_CONTROL_WITH_CHILDREN, team);
-            }
-            else if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
-                m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
-                send_message(CONTROL, READY_TO_CONTROL, team);
-            }
-            else if (other_fan_let_count < 5 && queued_process_pid) {
-                other_fan_let_count++;
-                send_message(queued_process_pid, INVITE_TO_CONTROL, message.info);
-                // std::cout << "Kibic (PID: " << my_pid << ") zaprosił innego kibica (PID: " << queued_process_pid << ") do kontroli. Aktualnie przepuścił " << other_fan_let_count << " kibiców" << std::endl;
-            }
-            else if (other_fan_let_count == 5) {
-                send_message(CONTROL, FAN_NERVOUS_ABOUT_WAITING);
-            }
-            else if (!queued_process_pid) {
-                send_message(CONTROL, NO_OTHER_IN_QUEUE);
-            }
-        }
-        else if (message.action == ENJOY_THE_GAME) {
-            std::cout << "Kibic (PID: " << my_pid << ") cieszy się grą." << std::endl;
-            change_location();
-        }
+        process_message(message);
     }
 }
+
+void process_message(FIFOMessage message) {
+    switch (message.action) {
+        case SET_QUEUED_PROCESS_PID:
+            process_set_queued_process_pid(message);
+        break;
+        case INVITE_TO_CONTROL:
+            process_invite_to_control(message);
+        break;
+        case ENJOY_THE_GAME:
+            process_enjoy_the_game(message);
+        break;
+        default:
+            std::cerr << "Unknown action: " << message.action << std::endl;
+        break;
+    }
+}
+
+void process_set_queued_process_pid(FIFOMessage message) {
+    queued_process_pid = std::stoi(message.info);
+}
+
+void process_invite_to_control(FIFOMessage message) {
+    if (children_count && std::stoi(message.info) == none) {
+        m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
+        send_message(CONTROL, READY_TO_CONTROL_WITH_CHILDREN, team);
+    }
+    else if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
+        m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
+        send_message(CONTROL, READY_TO_CONTROL, team);
+    }
+    else if (other_fan_let_count < 5 && queued_process_pid) {
+        other_fan_let_count++;
+        send_message(queued_process_pid, INVITE_TO_CONTROL, message.info);
+    }
+    else if (other_fan_let_count == 5) {
+        send_message(CONTROL, FAN_NERVOUS_ABOUT_WAITING);
+    }
+    else if (!queued_process_pid) {
+        send_message(CONTROL, NO_OTHER_IN_QUEUE);
+    }
+}
+
+void process_enjoy_the_game(FIFOMessage message) {
+    std::cout << "Kibic (PID: " << getpid() << ") cieszy się grą." << std::endl;
+    change_location();
+}
+
 
 void join_queue() {
     place = InQueue;
@@ -44,7 +65,7 @@ void join_queue() {
         send_message(STADIUM, VIP_ENTERED_TO_STADIUM, children_count);
     }
     else {
-        send_message(STADIUM, JOIN_TO_QUEUE, VIP);
+        send_message(STADIUM, JOIN_TO_QUEUE);
     }
 }
 
@@ -81,32 +102,31 @@ void setup_random_fan_data() {
     // std::cout << std::endl;
 }
 
-int is_outside() {
+bool is_outside() {
     return place == OnTheWay || place == InQueue || place == OnControl;
 }
 
 void checking_evacuation() {
     while (is_outside() || *evacuation_signal == 0) {
-        sleep(1);
+        s_sleep(1);
     }
-    printf("Fan %d is evacuating.\n", getpid());
+    std::cout << "Fan " << getpid() << " is evacuating." << std::endl;
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> evacuation_time(2, 120);
-    int wait_time = evacuation_time(gen);
-    sleep(wait_time);
+    move_to(Leaving, Leaved);
     send_message(STADIUM, LEAVING_STADIUM);
 }
 
 void move_to(const FanPlace moving_place, const FanPlace destination) {
+    int is_evacuating = *evacuation_signal;
     std::cout << "Kibic (PID: " << getpid() << ") zmienia miejsce z " << place << " na " << destination << std::endl;
     place = moving_place;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(10, 60);
     int wait_time = dis(gen);
-    std::this_thread::sleep_for(std::chrono::seconds(wait_time));
-    if (*evacuation_signal == 0) {
+    s_sleep(wait_time);
+    if (is_evacuating == *evacuation_signal) {
         place = destination;
         std::cout << "Kibic (PID: " << getpid() << ") dotarł na miejsce: " << place << std::endl;
     }
@@ -135,20 +155,4 @@ void change_location_if_want() {
     ){
         change_location();
     }
-}
-
-int main(){
-    setup_random_fan_data();
-    create_message_queue();
-    create_evacuation_shared_memory();
-    std::thread evacuation_thread(checking_evacuation);
-    evacuation_thread.detach();
-    std::thread listener_thread(listen_for_messages_stadium);
-    listener_thread.detach();
-    join_queue();
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        change_location_if_want();
-    }
-    return 0;
 }

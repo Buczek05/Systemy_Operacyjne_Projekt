@@ -19,13 +19,15 @@ enum FanPlace {
     OnTheWay,
     InQueue,
     OnControl,
+    Leaved,
 // INSIDE
     OnTheWayToTheStands,
     OnTheStands,
     OnTheWayToTheRestroom,
     Restroom,
     OnTheWayToEat,
-    OnEating
+    OnEating,
+    Leaving,
 };
 
 enum FIFOAction {
@@ -56,9 +58,21 @@ enum FIFOSpecialRecipient {
 
 key_t FIFO_KEY;
 int FIFO_ID;
+bool testing = false;
+int testing_sleep_s = 0;
 
 void create_message_queue();
+void clear_queue();
 void send_message(long, FIFOAction);
 void send_message(long, FIFOAction, int);
 void send_message(long, FIFOAction, const std::string&);
 FIFOMessage receive_message(long mtype);
+void delete_message_queue();
+
+int *evacuation_signal;
+void create_evacuation_shared_memory();
+void delete_evacuation_shared_memory();
+
+
+void s_sleep(int seconds);
+void ms_sleep(int ms);

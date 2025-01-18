@@ -4,6 +4,7 @@
 #include "utils.cpp"
 #include "test_fan_inside_control.cpp"
 #include "test_manager.cpp"
+#include "test_fan.cpp"
 
 #define GREEN "\033[0;32m"
 #define RED "\033[0;31m"
@@ -69,10 +70,30 @@ void run_int_func_with_str(bool (*func_to_run)(), const char *test_name) {
 }
 
 int main() {
+    testing = true;
+    create_message_queue();
+    create_evacuation_shared_memory();
+    clear_queue();
     run_int_func_with_str(test_fan_inside_control_add_fan, "Test FanInsideControl add_fan");
     run_int_func_with_str(test_fan_inside_control_remove_fan, "Test FanInsideControl remove_fan");
     run_int_func_with_str(test_print_fans_inside, "Test FanInsideControl print_fans_inside");
     run_int_func_with_str(test_create_technic, "Test create_technic");
     run_int_func_with_str(test_create_fan, "Test create_fan");
+    run_int_func_with_str(test_listen_for_messages, "Test fan listen messages");
+    run_int_func_with_str(test_process_message_invite_to_control_1, "Test process message invite to control 1");
+    run_int_func_with_str(test_process_message_invite_to_control_2, "Test process message invite to control 2");
+    run_int_func_with_str(test_process_message_invite_to_control_3, "Test process message invite to control 3");
+    run_int_func_with_str(test_process_message_invite_to_control_4, "Test process message invite to control 4");
+    run_int_func_with_str(test_process_message_invite_to_control_5, "Test process message invite to control 5");
+    run_int_func_with_str(test_process_message_set_queued_process_pid, "Test process message set queued process pid");
+    run_int_func_with_str(test_process_message_enjoy_the_game, "Test process message enjoy the game");
+    run_int_func_with_str(test_join_queue, "Test join queue");
+    run_int_func_with_str(test_generate_children, "Test generate children");
+    run_int_func_with_str(test_setup_random_fan_data, "Test setup random fan data");
+    run_int_func_with_str(test_is_outside, "Test is outside");
+    run_int_func_with_str(test_checking_evacuation, "Test checking evacuation");
+    run_int_func_with_str(test_move_to, "Test move to");
+    run_int_func_with_str(test_change_location, "Test change location");
+
     return 0;
 }

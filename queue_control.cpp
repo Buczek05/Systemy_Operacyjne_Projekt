@@ -1,6 +1,13 @@
 #include "queue_control.h"
 #include "fan_inside_control.cpp"
 
+void handle_exit_signal(int signal) {
+    std::cout << "Exiting..." << std::endl;
+    delete_message_queue();
+    delete_evacuation_shared_memory();
+    exit(0);
+}
+
 void listen_for_messages() {
     while (true) {
         FIFOMessage message = receive_message(getpid());
@@ -32,7 +39,7 @@ void signal_handler(int sig) {
         control_stop = true;
         int fan_inside = 0;
         while (true) {
-            std::this_thread::sleep_for(std::chrono::seconds(10));
+            s_sleep(10);
             int current_fan_inside = fan_inside_control.get_inside_fans_count();
             if (current_fan_inside == 0) {
                 std::cout << "\033[32mWszyscy kibice opuścili stadion\033[0m" << std::endl;
@@ -100,9 +107,11 @@ void listen_for_message_control(Control *control) {
 
 void Control::check_fan(pid_t fan_pid) {
     std::cout << "Sprawdzanie kibica o PID: " << fan_pid << std::endl;
-    std::srand(std::time(nullptr));
-    int wait_time = 2 + (std::rand() % 15);
-    std::this_thread::sleep_for(std::chrono::seconds(wait_time));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> evacuation_time(1, 10);
+    int wait_time =evacuation_time(gen);
+    s_sleep(wait_time);
     available_place++;
     std::cout << "Kibic o PID: " << fan_pid << " został sprawdzony." << std::endl;
     send_message(fan_pid, ENJOY_THE_GAME);
@@ -113,7 +122,7 @@ void Control::check_fan_with_children(pid_t fan_pid, int children_count) {
     std::srand(std::time(nullptr));
     for (int i = 0; i < children_count; i++) {
         int wait_time = 2 + (std::rand() % 15);
-        std::this_thread::sleep_for(std::chrono::seconds(wait_time));
+        s_sleep(wait_time);
     }
     available_place = AVAILABLE_PLACES;
     std::cout << "Kibic o PID: " << fan_pid << " i " << children_count << " dzieci został sprawdzony." << std::endl;
@@ -123,14 +132,14 @@ void Control::check_fan_with_children(pid_t fan_pid, int children_count) {
 void control() {
     while (true) {
         for (int i = 0; i < 3; i++) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            s_sleep(1);
             if (fan_inside_control.get_inside_fans_count() >= FAN_LIMIT) {
                 std::cout << "Limit reached" << std::endl;
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                s_sleep(5);
                 break;
             }
             if (control_stop) {
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                s_sleep(5);
                 break;
             }
             // std::cout << "Checking control: " << i << " available_place: " << controls[i].available_place << " actual first in queue: " << first_in_queue << std::endl;
@@ -150,6 +159,8 @@ int main() {
     *evacuation_signal = 0;
     signal(SIGUSR1, signal_handler);
     signal(SIGUSR2, signal_handler);
+    signal(SIGINT, handle_exit_signal);
+    signal(SIGTERM, handle_exit_signal);
     while (true) {
         FIFOMessage message = {};
         if (msgrcv(FIFO_ID, &message, sizeof(message) - sizeof(long), 0, IPC_NOWAIT) == -1) {
@@ -169,7 +180,7 @@ int main() {
     std::thread control_thread(control);
     control_thread.detach();
     while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        s_sleep(1);
     }
     return 0;
 }

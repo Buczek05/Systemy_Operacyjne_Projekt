@@ -34,18 +34,18 @@ bool test_create_technic(){
 }
 
 bool test_create_fan() {
-  kill_all_processes("fan");
-  bool process_exists_before = check_process_exists("fan");
+  kill_all_processes("run_fan");
+  bool process_exists_before = check_process_exists("run_fan");
   if (process_exists_before) {
     throw TestException("Fan process already exists");
   }
 
   create_fan();
 
-  bool process_exists_after = check_process_exists("fan");
+  bool process_exists_after = check_process_exists("run_fan");
   if (!process_exists_after) {
     throw TestException("Fan process was not created");
   }
-  kill_all_processes("fan");
+  kill_all_processes("run_fan");
   return !process_exists_before && process_exists_after;
 }

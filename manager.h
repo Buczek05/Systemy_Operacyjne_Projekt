@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <thread>
 #include <chrono>
+#include "utils.cpp"
 
 #pragma once
 pid_t technic_pid = 0;
