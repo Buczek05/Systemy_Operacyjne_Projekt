@@ -4,10 +4,16 @@
 #include <thread>
 #include <chrono>
 #include "utils.cpp"
+#include "logs.cpp"
 
 #pragma once
+
+#define MAX_FAN_PROCESSES 10000
+
 pid_t technic_pid = 0;
 int created_fans = 0;
+Logger logger("logs/manager");
+
 
 int main();
 void create_technic();

@@ -4,9 +4,11 @@ void listen_for_messages() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
-        // std::cout << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
-        //           << "Action: " << message.action << ", Sender: " << message.sender
-        //           << ", Info: " << message.info << std::endl;
+        std::ostringstream logStream;
+        logStream << "Kibic (PID: " << my_pid << ") otrzymał wiadomość: "
+                << "Action: " << message.action << ", Sender: " << message.sender
+                << ", Info: " << message.info ;
+        logger << logStream.str();
         process_message(message);
     }
 }
@@ -15,16 +17,18 @@ void process_message(FIFOMessage message) {
     switch (message.action) {
         case SET_QUEUED_PROCESS_PID:
             process_set_queued_process_pid(message);
-        break;
+            break;
         case INVITE_TO_CONTROL:
             process_invite_to_control(message);
-        break;
+            break;
         case ENJOY_THE_GAME:
             process_enjoy_the_game(message);
-        break;
+            break;
         default:
-            std::cerr << "Unknown action: " << message.action << std::endl;
-        break;
+            std::ostringstream logStream;
+            logStream << "Unknown action: " << message.action;
+            logger << logStream.str();
+            break;
     }
 }
 
@@ -36,35 +40,31 @@ void process_invite_to_control(FIFOMessage message) {
     if (children_count && std::stoi(message.info) == none) {
         m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
         send_message(CONTROL, READY_TO_CONTROL_WITH_CHILDREN, team);
-    }
-    else if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
+    } else if (std::stoi(message.info) == none || std::stoi(message.info) == team) {
         m_send_message(message.sender, SET_QUEUED_PROCESS_PID, std::to_string(queued_process_pid));
         send_message(CONTROL, READY_TO_CONTROL, team);
-    }
-    else if (other_fan_let_count < 5 && queued_process_pid) {
+    } else if (other_fan_let_count < 5 && queued_process_pid) {
         other_fan_let_count++;
         send_message(queued_process_pid, INVITE_TO_CONTROL, message.info);
-    }
-    else if (other_fan_let_count == 5) {
+    } else if (other_fan_let_count == 5) {
         send_message(CONTROL, FAN_NERVOUS_ABOUT_WAITING);
-    }
-    else if (!queued_process_pid) {
+    } else if (!queued_process_pid) {
         send_message(CONTROL, NO_OTHER_IN_QUEUE);
     }
 }
 
 void process_enjoy_the_game(FIFOMessage message) {
-    std::cout << "Kibic (PID: " << getpid() << ") cieszy się grą." << std::endl;
+    std::ostringstream logStream;
+    logStream << "Kibic (PID: " << getpid() << ") cieszy się grą.";
+    logger << logStream.str();
     change_location();
 }
-
 
 void join_queue() {
     place = InQueue;
     if (VIP) {
         send_message(STADIUM, VIP_ENTERED_TO_STADIUM, children_count);
-    }
-    else {
+    } else {
         send_message(STADIUM, JOIN_TO_QUEUE);
     }
 }
@@ -93,13 +93,14 @@ void setup_random_fan_data() {
     VIP = std::uniform_int_distribution<>(1, 200)(gen) == 1;
     age = std::uniform_int_distribution<>(16, 100)(gen);
     generate_children();
-    // std::cout << "Kibic (PID: " << getpid() << "), wiek: " << age << ", VIP: " << (VIP ? "TAK" : "NIE")
-    //         << ", drużyna: " << team << ", liczba dzieci: " << children_count << ", dzieci: ";
-    // for (int i = 0; i < children_count; i++) {
-    //     if (i > 0) std::cout << ", ";
-    //     std::cout << "dziecko " << i + 1 << " (wiek: " << children[i].age << " lat)";
-    // }
-    // std::cout << std::endl;
+    std::ostringstream logStream;
+    logStream << "Kibic (PID: " << getpid() << "), wiek: " << age << ", VIP: " << (VIP ? "TAK" : "NIE")
+            << ", drużyna: " << team << ", liczba dzieci: " << children_count << ", dzieci: ";
+    for (int i = 0; i < children_count; i++) {
+        if (i > 0) logStream << ", ";
+        logStream << "dziecko " << i + 1 << " (wiek: " << children[i].age << " lat)";
+    }
+    logger << logStream.str();
 }
 
 bool is_outside() {
@@ -110,7 +111,9 @@ void checking_evacuation() {
     while (is_outside() || *evacuation_signal == 0) {
         s_sleep(1);
     }
-    std::cout << "Fan " << getpid() << " is evacuating." << std::endl;
+    std::ostringstream logStream;
+    logStream << "Fan " << getpid() << " is evacuating.";
+    logger << logStream.str();
     std::random_device rd;
     std::mt19937 gen(rd());
     move_to(Leaving, Leaved);
@@ -119,7 +122,9 @@ void checking_evacuation() {
 
 void move_to(const FanPlace moving_place, const FanPlace destination) {
     int is_evacuating = *evacuation_signal;
-    std::cout << "Kibic (PID: " << getpid() << ") zmienia miejsce z " << place << " na " << destination << std::endl;
+    std::ostringstream logStream;
+    logStream << "Kibic (PID: " << getpid() << ") zmienia miejsce z " << place << " na " << destination;
+    logger << logStream.str();
     place = moving_place;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -128,7 +133,9 @@ void move_to(const FanPlace moving_place, const FanPlace destination) {
     s_sleep(wait_time);
     if (is_evacuating == *evacuation_signal) {
         place = destination;
-        std::cout << "Kibic (PID: " << getpid() << ") dotarł na miejsce: " << place << std::endl;
+        logStream.str("");
+        logStream << "Kibic (PID: " << getpid() << ") dotarł na miejsce: " << place;
+        logger << logStream.str();
     }
 }
 
@@ -149,10 +156,10 @@ void change_location_if_want() {
     std::uniform_int_distribution<> dis(1, 1000000);
     int chance = dis(gen);
     if (
-        (place == OnTheStands && chance % (20*60) == 0)
+        (place == OnTheStands && chance % (20 * 60) == 0)
         || (place == Restroom && chance % (60) == 0)
-        || (place == OnEating && chance % (5*60) == 0)
-    ){
+        || (place == OnEating && chance % (5 * 60) == 0)
+    ) {
         change_location();
     }
 }

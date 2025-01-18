@@ -1,6 +1,7 @@
 #include "manager.cpp"
 
 int main() {
+    logger << "Manager started";
     signal(SIGUSR1, handle_signal);
     signal(SIGUSR2, handle_signal);
     create_technic();

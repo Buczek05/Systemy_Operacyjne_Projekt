@@ -1,5 +1,6 @@
 # pragma once
 #include "utils.cpp"
+#include "logs.cpp"
 #include <thread>
 #include <chrono>
 
@@ -18,6 +19,7 @@ pid_t queued_process_pid = 0;
 
 int children_count = 0;
 Child *children = NULL;
+Logger logger("logs/fan");
 
 void listen_for_messages();
 void process_message(FIFOMessage message);

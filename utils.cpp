@@ -3,6 +3,11 @@
 #include <thread>
 #include <sys/shm.h>
 
+#include "logs.h"
+
+extern Logger logger;
+
+
 void create_message_queue() {
     FIFO_KEY = ftok(".", 'a');
     if (FIFO_KEY == -1) {
@@ -26,7 +31,9 @@ void clear_queue() {
                 exit(EXIT_FAILURE);
             }
         }else {
-            std::cout << "Wiadomość sender: " << message.sender << " Action: " << message.action << std::endl;
+            std::ostringstream logStream;
+            logStream << "Wiadomość sender: " << message.sender << " Action: " << message.action;
+            logger << logStream.str();
         }
     }
 }
@@ -117,4 +124,11 @@ void ms_sleep(int ms) {
         std::this_thread::sleep_for(std::chrono::seconds(testing_sleep_s));
         return;
     }
+}
+
+int get_random_number(int from, int to) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(from, to);
+    return dis(gen);
 }

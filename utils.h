@@ -76,3 +76,5 @@ void delete_evacuation_shared_memory();
 
 void s_sleep(int seconds);
 void ms_sleep(int ms);
+
+int get_random_number(int from, int to);
