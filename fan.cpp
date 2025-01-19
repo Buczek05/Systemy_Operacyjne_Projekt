@@ -1,6 +1,7 @@
+#pragma once
 #include "fan.h"
 
-void listen_for_messages() {
+void listen_for_messages_fan() {
     pid_t my_pid = getpid();
     while (true) {
         FIFOMessage message = receive_message(my_pid);
@@ -161,5 +162,21 @@ void change_location_if_want() {
         || (place == OnEating && chance % (5 * 60) == 0)
     ) {
         change_location();
+    }
+}
+
+void fan(){
+    new(&logger) Logger("logs/fan");
+    setup_random_fan_data();
+    create_message_queue();
+    create_evacuation_shared_memory();
+    std::thread evacuation_thread(checking_evacuation);
+    evacuation_thread.detach();
+    std::thread listener_thread(listen_for_messages_fan);
+    listener_thread.detach();
+    join_queue();
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        change_location_if_want();
     }
 }

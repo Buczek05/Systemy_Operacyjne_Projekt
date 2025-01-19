@@ -1,6 +1,7 @@
 #include "logs.h"
 #include <unistd.h>
 #include <iostream>
+#pragma once
 
 Logger::Logger(const std::string& baseFileName)
     : mainFileName(baseFileName + ".log"), stopLogging(false) {
@@ -28,7 +29,9 @@ Logger::~Logger() {
         stopLogging = true;
     }
     cv.notify_all();
-    loggingThread.join();
+    if (loggingThread.joinable() && loggingThread.get_id() != std::this_thread::get_id()) {
+        loggingThread.join();
+    }
 
     fileMain.close();
     filePid.close();
@@ -70,3 +73,5 @@ void Logger::processLogs() {
         sem_post(&semPid);
     }
 }
+
+Logger logger("logs/logs");

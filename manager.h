@@ -5,6 +5,8 @@
 #include <chrono>
 #include "utils.cpp"
 #include "logs.cpp"
+#include "technic.cpp"
+#include "fan.cpp"
 
 #pragma once
 
@@ -12,7 +14,6 @@
 
 pid_t technic_pid = 0;
 int created_fans = 0;
-Logger logger("logs/manager");
 
 
 int main();

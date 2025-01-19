@@ -19,9 +19,8 @@ pid_t queued_process_pid = 0;
 
 int children_count = 0;
 Child *children = NULL;
-Logger logger("logs/fan");
 
-void listen_for_messages();
+void listen_for_messages_fan();
 void process_message(FIFOMessage message);
 void process_set_queued_process_pid(FIFOMessage message);
 void process_invite_to_control(FIFOMessage message);
@@ -34,3 +33,5 @@ void checking_evacuation();
 void move_to(const FanPlace moving_place, const FanPlace destination);
 void change_location();
 void change_location_if_want();
+
+void fan();

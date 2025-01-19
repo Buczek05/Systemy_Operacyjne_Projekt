@@ -1,3 +1,4 @@
+#pragma once
 #include "control.h"
 
 void listen_for_message_control(Control *control) {

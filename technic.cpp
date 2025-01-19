@@ -11,11 +11,11 @@ void stop_control(int sig) {
     control_stop = !control_stop;
     if (control_stop) {
         logger << "Kontrola zatrzymana";
-    }
-    else {
+    } else {
         logger << "Kontrola wznowiona";
     }
 }
+
 void start_evacuation(int sig) {
     *evacuation_signal = 1;
     control_stop = true;
@@ -40,25 +40,23 @@ void listen_for_messages_stadium() {
         FIFOMessage message = receive_message(STADIUM);
         std::ostringstream logStream;
         logStream << "Kolejka otrzymała wiadomość: "
-                  << "Action: " << message.action << ", Sender: " << message.sender
-                  << ", Info: " << message.info;
+                << "Action: " << message.action << ", Sender: " << message.sender
+                << ", Info: " << message.info;
         logger << logStream.str();
         if (message.action == JOIN_TO_QUEUE) {
             process_join_to_queue(message);
-        }
-        else if (message.action == VIP_ENTERED_TO_STADIUM) {
+        } else if (message.action == VIP_ENTERED_TO_STADIUM) {
             int children_count = std::stoi(message.info);
             fan_inside_control.add_fan_inside(message.sender, children_count + 1);
             send_message(message.sender, ENJOY_THE_GAME);
-        }
-        else if (message.action == LEAVING_STADIUM) {
+        } else if (message.action == LEAVING_STADIUM) {
             fan_inside_control.remove_fan_inside(message.sender);
         }
     }
 }
 
-
-int main() {
+void technic() {
+    new(&logger) Logger("logs/technic");
     logger << "Technic started";
     signal(SIGUSR1, stop_control);
     signal(SIGUSR2, start_evacuation);
@@ -80,5 +78,4 @@ int main() {
     while (true) {
         s_sleep(1);
     }
-    return 0;
 }

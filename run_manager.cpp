@@ -1,6 +1,8 @@
 #include "manager.cpp"
 
 int main() {
+    logger.~Logger();
+    new(&logger) Logger("logs/manager");
     logger << "Manager started";
     signal(SIGUSR1, handle_signal);
     signal(SIGUSR2, handle_signal);

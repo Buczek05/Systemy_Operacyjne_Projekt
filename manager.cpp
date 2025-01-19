@@ -9,7 +9,7 @@ void create_technic(){
         exit(EXIT_FAILURE);
     }
     if (technic_pid == 0) {
-        execlp("./queue_control", "queue_control", nullptr);
+        technic();
         exit(EXIT_FAILURE);
     }
 }
@@ -25,7 +25,7 @@ void create_fan(){
         exit(EXIT_FAILURE);
     }
     if (fan_pid == 0) {
-        execlp("./run_fan", "run_fan", nullptr);
+        fan();
         exit(EXIT_FAILURE);
     }
 }
