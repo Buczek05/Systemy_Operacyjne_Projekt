@@ -1,6 +1,9 @@
 #include "manager.cpp"
 
+
 int main() {
+    std::cout << getpid() << std::endl;
+    s_sleep(10);
     logger.~Logger();
     new(&logger) Logger("logs/manager");
     logger << "Manager started";
@@ -9,7 +12,7 @@ int main() {
     create_technic();
 
     while (true) {
-        sleep(1);
+        s_sleep(1);
         int new_fans_count = get_new_fans_count();
         for (int i = 0; i < new_fans_count; i++) create_fan();
         if (rand() % 1000 == 0) send_stop_start_signal();

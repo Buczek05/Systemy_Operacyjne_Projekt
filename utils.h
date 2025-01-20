@@ -68,6 +68,7 @@ void clear_queue();
 void send_message(long, FIFOAction);
 void send_message(long, FIFOAction, int);
 void send_message(long, FIFOAction, const std::string&);
+void m_send_message(long, FIFOAction, const std::string&);
 FIFOMessage receive_message(long mtype);
 void delete_message_queue();
 

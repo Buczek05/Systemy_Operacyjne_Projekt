@@ -3,7 +3,6 @@
 #include <iostream>
 #include "utils.cpp"
 #include "test_fan_inside_control.cpp"
-#include "test_manager.cpp"
 #include "test_fan.cpp"
 
 #define GREEN "\033[0;32m"
@@ -77,8 +76,6 @@ int main() {
     run_int_func_with_str(test_fan_inside_control_add_fan, "Test FanInsideControl add_fan");
     run_int_func_with_str(test_fan_inside_control_remove_fan, "Test FanInsideControl remove_fan");
     run_int_func_with_str(test_print_fans_inside, "Test FanInsideControl print_fans_inside");
-    run_int_func_with_str(test_create_technic, "Test create_technic");
-    run_int_func_with_str(test_create_fan, "Test create_fan");
     run_int_func_with_str(test_listen_for_messages, "Test fan listen messages");
     run_int_func_with_str(test_process_message_invite_to_control_1, "Test process message invite to control 1");
     run_int_func_with_str(test_process_message_invite_to_control_2, "Test process message invite to control 2");

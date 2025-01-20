@@ -3,7 +3,7 @@
 
 bool test_listen_for_messages() {
     create_message_queue();
-    std::thread listener_thread(listen_for_messages);
+    std::thread listener_thread(listen_for_messages_fan);
     listener_thread.detach();
     queued_process_pid = 0;
     send_message(getpid(), SET_QUEUED_PROCESS_PID, 123111);

@@ -1,3 +1,4 @@
+#pragma once
 #include "fan_inside_control.h"
 
 #include "logs.h"

@@ -166,6 +166,7 @@ void change_location() {
 }
 
 void change_location_if_want() {
+    if (*evacuation_signal) return;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(1, 1000000);

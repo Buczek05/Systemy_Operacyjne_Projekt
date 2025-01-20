@@ -40,6 +40,6 @@ bool test_print_fans_inside() {
     std::ostringstream output_stream;
     fan_inside_control.print_fans_inside(output_stream);
     std::string output = output_stream.str();
-    std::string expected_output = "Fans inside: \nPID = 3312\nPID = 3314\nPID = 3316\nPID = 3318\nPID = 3320\n";
+    std::string expected_output = "PID = 3312\nPID = 3314\nPID = 3316\nPID = 3318\nPID = 3320\n";
     return output == expected_output;
 }

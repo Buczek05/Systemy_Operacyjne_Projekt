@@ -3,7 +3,7 @@
 #include "fan_inside_control.cpp"
 
 #define AVAILABLE_PLACES 3
-#define FAN_LIMIT 50000
+#define FAN_LIMIT 50
 
 extern Logger logger;
 

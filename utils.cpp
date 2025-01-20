@@ -47,6 +47,11 @@ void send_message(long mtype, FIFOAction action, int info) {
     send_message(mtype, action, std::to_string(info).data());
 }
 
+void send_message(long mtype, FIFOAction action, const std::string& info) {
+    std::thread worker(m_send_message, mtype, action, info);
+    worker.detach();
+}
+
 void m_send_message(long mtype, FIFOAction action, const std::string& info) {
     FIFOMessage message = {};
     message.mtype = mtype;
@@ -58,11 +63,6 @@ void m_send_message(long mtype, FIFOAction action, const std::string& info) {
         perror("msgsnd failed");
         exit(EXIT_FAILURE);
     }
-}
-
-void send_message(long mtype, FIFOAction action, const std::string& info) {
-    std::thread worker(m_send_message, mtype, action, info);
-    worker.detach();
 }
 
 FIFOMessage receive_message(long mtype) {

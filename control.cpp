@@ -113,7 +113,7 @@ void control() {
     controls[2].control_number = 3;
     while (true) {
         for (int i = 0; i < 3; i++) {
-            s_sleep(1);
+            ms_sleep(100);
             if (is_limit_reached() || control_stop) {
                 break;
             }

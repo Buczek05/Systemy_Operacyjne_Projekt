@@ -10,7 +10,7 @@
 
 #pragma once
 
-#define MAX_FAN_PROCESSES 10000
+#define MAX_FAN_PROCESSES 1000
 
 pid_t technic_pid = 0;
 int created_fans = 0;
