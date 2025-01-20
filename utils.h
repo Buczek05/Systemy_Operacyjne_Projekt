@@ -42,6 +42,7 @@ enum FIFOAction {
     ENJOY_THE_GAME,  // info is empty
     LIMIT_REACHED,  // info is empty
     LEAVING_STADIUM,  // info is empty
+    VISUALIZATION_ACTION,  // info is message
 };
 
 struct FIFOMessage {
@@ -53,7 +54,8 @@ struct FIFOMessage {
 
 enum FIFOSpecialRecipient {
     CONTROL = 1,
-    STADIUM = 2
+    STADIUM = 2,
+    VISUALIZATION = 3,
 };
 
 key_t FIFO_KEY;
@@ -78,3 +80,5 @@ void s_sleep(int seconds);
 void ms_sleep(int ms);
 
 int get_random_number(int from, int to);
+
+void send_to_visualization(const std::string& message);

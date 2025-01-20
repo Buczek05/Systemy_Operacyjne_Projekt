@@ -61,21 +61,31 @@ void process_no_other_in_queue(Control *control, FIFOMessage message) {
 }
 
 void Control::check_fan(pid_t fan_pid) {
+    std::ostringstream visualization_message;
+    visualization_message << "{\"type\": \"check_fan\", \"fan_pid\": " << fan_pid
+            << ", \"children_count\": " << 0 << ", \"control_number\": " << control_number << "}";
+    send_to_visualization(visualization_message.str());
+
     std::ostringstream logStream;
-    logStream << "Sprawdzanie kibica o PID: " << fan_pid;
+    logStream << "Sprawdzanie kibica o PID: " << fan_pid << " w kontroli nr: " << control_number;
     logger << logStream.str();
     int wait_time = get_random_number(1, 10);
     s_sleep(wait_time);
     available_place++;
     logStream.str("");
-    logStream << "Kibic o PID: " << fan_pid << " został sprawdzony.";
+    logStream << "Kibic o PID: " << fan_pid << " został sprawdzony." << " w kontroli nr: " << control_number;
     logger << logStream.str();
     send_message(fan_pid, ENJOY_THE_GAME);
 }
 
 void Control::check_fan_with_children(pid_t fan_pid, int children_count) {
+    std::ostringstream visualization_message;
+    visualization_message << "{\"type\": \"check_fan\", \"fan_pid\": " << fan_pid
+            << ", \"children_count\": " << children_count << ", \"control_number\": " << control_number << "}";
+    send_to_visualization(visualization_message.str());
+
     std::ostringstream logStream;
-    logStream << "Sprawdzanie kibica o PID: " << fan_pid << " i " << children_count << " dzieci";
+    logStream << "Sprawdzanie kibica o PID: " << fan_pid << " i " << children_count << " dzieci" << " w kontroli nr: " << control_number;
     logger << logStream.str();
     std::srand(std::time(nullptr));
     for (int i = 0; i < children_count; i++) {
@@ -84,7 +94,7 @@ void Control::check_fan_with_children(pid_t fan_pid, int children_count) {
     }
     available_place = AVAILABLE_PLACES;
     logStream.str("");
-    logStream << "Kibic o PID: " << fan_pid << " i " << children_count << " dzieci został sprawdzony.";
+    logStream << "Kibic o PID: " << fan_pid << " i " << children_count << " dzieci został sprawdzony." << " w kontroli nr: " << control_number;
     logger << logStream.str();
     send_message(fan_pid, ENJOY_THE_GAME);
 }
@@ -98,18 +108,19 @@ bool is_limit_reached() {
 }
 
 void control() {
+    controls[0].control_number = 1;
+    controls[1].control_number = 2;
+    controls[2].control_number = 3;
     while (true) {
         for (int i = 0; i < 3; i++) {
             s_sleep(1);
             if (is_limit_reached() || control_stop) {
-                s_sleep(5);
                 break;
             }
             if (controls[i].available_place > 0 and first_in_queue) {
                 controls[i].team = (controls[i].available_place == 3) ? none : controls[i].team;
                 send_message(first_in_queue, INVITE_TO_CONTROL, controls[i].team);
                 listen_for_message_control(&controls[i]);
-                break;
             }
         }
     }

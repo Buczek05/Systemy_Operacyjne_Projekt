@@ -58,7 +58,6 @@ void FansInsideControl::remove_fan_inside(pid_t fan_pid) {
 }
 
 void FansInsideControl::print_fans_inside(std::ostream &output_stream) const {
-    output_stream << "Fans inside: " << std::endl;
     for (int i = 0; i < fan_inside_next_index; i++) {
         if (fans_inside[i]) {
             output_stream << "PID = " << fans_inside[i] << std::endl;

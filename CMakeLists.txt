@@ -4,8 +4,6 @@ project(Systemy_Operacyjne_Projekt LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(queue_control technic.cpp)
-add_executable(run_fan run_fan.cpp)
 add_executable(run_manager run_manager.cpp)
 
 add_custom_target(run

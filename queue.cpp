@@ -20,6 +20,10 @@ void set_queued_process_pid(pid_t to, int info) {
 }
 
 void process_join_to_queue(FIFOMessage message) {
+    std::ostringstream visualization_message;
+    visualization_message << "{\"type\": \"join_to_queue\", \"fan_pid\": " << message.sender << "}";
+    send_to_visualization(visualization_message.str());
+
     if (last_in_queue)
         send_message(last_in_queue, SET_QUEUED_PROCESS_PID, message.sender);
     last_in_queue = message.sender;

@@ -15,7 +15,7 @@ void create_technic(){
 }
 
 void create_fan(){
-    ms_sleep(100);
+    ms_sleep(1000);
     created_fans++;
     pid_t fan_pid = fork();
     if (fan_pid < 0) {

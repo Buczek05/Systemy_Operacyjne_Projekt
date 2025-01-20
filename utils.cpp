@@ -107,22 +107,18 @@ void delete_evacuation_shared_memory() {
 void s_sleep(int seconds) {
     if (!testing) {
         std::this_thread::sleep_for(std::chrono::seconds(seconds));
-        return;
     }
-    if (testing_sleep_s) {
+    else if (testing_sleep_s) {
         std::this_thread::sleep_for(std::chrono::seconds(testing_sleep_s));
-        return;
     }
 }
 
 void ms_sleep(int ms) {
     if (!testing) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-        return;
     }
-    if (testing_sleep_s) {
+    else if (testing_sleep_s) {
         std::this_thread::sleep_for(std::chrono::seconds(testing_sleep_s));
-        return;
     }
 }
 
@@ -131,4 +127,8 @@ int get_random_number(int from, int to) {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(from, to);
     return dis(gen);
+}
+
+void send_to_visualization(const std::string& message) {
+    send_message(VISUALIZATION, VISUALIZATION_ACTION, message);
 }

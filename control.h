@@ -11,6 +11,7 @@ class Control {
 public:
     Team team;
     int available_place;
+    int control_number;
     Control() {team=none; available_place=AVAILABLE_PLACES;};
     void check_fan(pid_t);
     void check_fan_with_children(pid_t, int);

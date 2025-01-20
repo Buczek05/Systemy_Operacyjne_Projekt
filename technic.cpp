@@ -28,8 +28,10 @@ void start_evacuation(int sig) {
             break;
         }
         if (fan_inside == current_fan_inside) {
-            logger << "Zagubieni kibice podczas ewakuacji:";
-            fan_inside_control.print_fans_inside();
+            std::ostringstream logStream;
+            logStream << "Zagubieni kibice podczas ewakuacji:";
+            fan_inside_control.print_fans_inside(logStream);
+            logger << logStream.str();
         }
         fan_inside = current_fan_inside;
     }

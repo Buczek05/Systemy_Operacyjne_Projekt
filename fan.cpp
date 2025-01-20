@@ -34,6 +34,10 @@ void process_message(FIFOMessage message) {
 }
 
 void process_set_queued_process_pid(FIFOMessage message) {
+    std::ostringstream visualization_message;
+    visualization_message << "{\"type\": \"set_queued_process_pid\", \"fan_pid\": " << getpid()
+            << ", \"queued_process_pid\": " << message.info << "}";
+    send_to_visualization(visualization_message.str());
     queued_process_pid = std::stoi(message.info);
 }
 
@@ -122,6 +126,11 @@ void checking_evacuation() {
 }
 
 void move_to(const FanPlace moving_place, const FanPlace destination) {
+    std::ostringstream visualization_message;
+    visualization_message << "{\"type\": \"moving\", \"fan_pid\": " << getpid()
+            << ", \"from\": " << place << ", \"to\": " << destination << "}";
+    send_to_visualization(visualization_message.str());
+
     int is_evacuating = *evacuation_signal;
     std::ostringstream logStream;
     logStream << "Kibic (PID: " << getpid() << ") zmienia miejsce z " << place << " na " << destination;
@@ -138,6 +147,11 @@ void move_to(const FanPlace moving_place, const FanPlace destination) {
         logStream << "Kibic (PID: " << getpid() << ") dotarł na miejsce: " << place;
         logger << logStream.str();
     }
+
+    visualization_message.str("");
+    visualization_message << "{\"type\": \"moved\", \"fan_pid\": " << getpid()
+            << ", \"place\": " << destination << "}";
+    send_to_visualization(visualization_message.str());
 }
 
 void change_location() {
