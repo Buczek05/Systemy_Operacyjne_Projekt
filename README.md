@@ -1,5 +1,7 @@
 # Raport
 
+https://github.com/Buczek05/Systemy_Operacyjne_Projekt
+
 # Założenia projektowe
 
 Na stadionie piłkarskim rozegrany ma zostać mecz finałowy Ligi Mistrzów. Z uwagi na rangę imprezy ustalono rygorystyczne zasady bezpieczeństwa.
