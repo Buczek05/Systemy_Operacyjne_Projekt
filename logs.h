@@ -6,7 +6,8 @@
 #include <mutex>
 #include <semaphore.h>
 #include <sys/stat.h>
-
+#include <condition_variable>
+#pragma once
 class Logger {
 private:
     std::ofstream fileMain;

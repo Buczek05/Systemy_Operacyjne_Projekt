@@ -5,6 +5,7 @@
 
 Logger::Logger(const std::string& baseFileName)
     : mainFileName(baseFileName + ".log"), stopLogging(false) {
+    mkdir("logs", 0777);
     fileMain.open(mainFileName, std::ios::app);
     if (!fileMain.is_open()) {
         throw std::runtime_error("Failed to open main log file");

@@ -3,7 +3,6 @@
 
 int main() {
     std::cout << getpid() << std::endl;
-    s_sleep(10);
     logger.~Logger();
     new(&logger) Logger("logs/manager");
     logger << "Manager started";

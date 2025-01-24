@@ -1,4 +1,5 @@
 #include "manager.h"
+#pragma once
 
 void create_technic(){
     technic_pid = fork();

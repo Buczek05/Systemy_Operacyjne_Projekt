@@ -7,6 +7,8 @@
 #include <cstring>
 #include <fstream>
 #include <random>
+#include <sstream>
+#include <queue>
 
 enum Team {
     none,

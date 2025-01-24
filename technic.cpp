@@ -1,4 +1,5 @@
 #include "technic.h"
+#pragma once
 
 void handle_exit_signal(int signal) {
     logger << "Exiting...";
