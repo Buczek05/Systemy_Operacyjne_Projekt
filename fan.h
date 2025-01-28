@@ -20,6 +20,8 @@ pid_t queued_process_pid = 0;
 int children_count = 0;
 Child *children = NULL;
 
+std::thread *child_threads = NULL;
+
 void listen_for_messages_fan();
 void process_message(FIFOMessage message);
 void process_set_queued_process_pid(FIFOMessage message);
@@ -33,5 +35,6 @@ void checking_evacuation();
 void move_to(const FanPlace moving_place, const FanPlace destination);
 void change_location();
 void change_location_if_want();
+void create_child();
 
 void fan();

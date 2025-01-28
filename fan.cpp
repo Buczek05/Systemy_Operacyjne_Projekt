@@ -84,9 +84,12 @@ void generate_children() {
     std::uniform_int_distribution<> age_distribution(0, 15);
 
     children = new Child[children_count];
+    child_threads = new std::thread[children_count];
     for (int i = 0; i < children_count; i++) {
         int age = age_distribution(gen);
         children[i] = Child(age);
+        child_threads[i] = std::thread(create_child);
+        child_threads[i].detach();
     }
 }
 
@@ -180,6 +183,14 @@ void change_location_if_want() {
     }
 }
 
+void create_child() {
+    while (true) {
+        s_sleep(1);
+        change_location_if_want();
+    }
+}
+
+
 void fan(){
     new(&logger) Logger("logs/fan");
     setup_random_fan_data();
@@ -191,7 +202,7 @@ void fan(){
     listener_thread.detach();
     join_queue();
     while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        s_sleep(1);
         change_location_if_want();
     }
 }
