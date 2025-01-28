@@ -128,8 +128,9 @@ def receive_messages(queue):
     while True:
         try:
             message, message_type = queue.receive(block=True, type=TARGET_MESSAGE_TYPE)
+            print(f"Received message: {message.decode("utf-8", errors="ignore")}")
             message_text = "{" + message.decode("utf-8", errors="ignore").split("{", 1)[1].strip("\x00")
-            print(f"Received message: {message_text}")
+            print(f"Received message after format: {message_text}")
             data = json.loads(message_text)
             fan_pid = data.get("fan_pid")
             fan = fans[fan_pid] if fan_pid in fans else Fan(fan_pid)

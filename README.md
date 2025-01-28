@@ -81,7 +81,7 @@ Zgodnie z opisem zadania wykorzystałem sygnały do zatrzymywania / wznawiania w
 
 Przygotowałem prostą wizualizacje z pomocą języka python oraz biblioteki matplotlib która na żywo prezentuje zachowanie każdego kibica
 
-Film `przedstawienie_[wizualizacji.mov](http://wizualizacji.mov)` dostępny w plikach źródłowych
+Film `przedstawienie_wizualizacji.mov` dostępny w plikach źródłowych
 
 # Testy
 

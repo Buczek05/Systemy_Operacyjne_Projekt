@@ -16,7 +16,6 @@ pid_t technic_pid = 0;
 int created_fans = 0;
 
 
-int main();
 void create_technic();
 void create_fan();
 
